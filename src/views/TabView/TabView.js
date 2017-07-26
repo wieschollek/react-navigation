@@ -38,7 +38,8 @@ type Props = {
   swipeEnabled?: boolean,
   animationEnabled?: boolean,
   lazy?: boolean,
-
+  addonView?: ReactClass<*>,
+  showAddonOn?: [],
   screenProps?: {},
   navigation: NavigationScreenProp<NavigationState, NavigationAction>,
   router: NavigationRouter<
@@ -49,6 +50,19 @@ type Props = {
   childNavigationProps: {
     [key: string]: NavigationScreenProp<NavigationRoute, NavigationAction>,
   },
+};
+
+export const getCurrentRouteName = (navigationState) => {
+  if (!navigationState) {
+    return null;
+  }
+  const route = navigationState.routes[navigationState.index];
+  // dive into nested navigators
+  if (route.routes) {
+    return getCurrentRouteName(route);
+  }
+
+  return route.routeName;
 };
 
 class TabView extends PureComponent<void, Props, void> {
@@ -75,6 +89,18 @@ class TabView extends PureComponent<void, Props, void> {
       </View>
     );
   };
+
+  _renderAddon = ({ navigationState }: any) => {
+    const { addonView: AddonView, showAddonOn } = this.props;
+    const routeName = getCurrentRouteName(navigationState);
+    console.log(routeName);
+    if (AddonView && showAddonOn.indexOf(routeName) !== -1) {
+      console.log('render');
+      return <AddonView />;
+    }
+
+    return null;
+  }
 
   _getLabel = ({ route, tintColor, focused }: TabScene) => {
     const options = this.props.router.getScreenOptions(
@@ -175,6 +201,7 @@ class TabView extends PureComponent<void, Props, void> {
       renderPager,
       renderHeader,
       renderFooter,
+      renderAddon: this._renderAddon,
       renderScene: this._renderScene,
       onRequestChangeTab: this._handlePageChanged,
       navigationState: this.props.navigation.state,
