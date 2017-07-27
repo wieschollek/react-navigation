@@ -93,9 +93,7 @@ class TabView extends PureComponent<void, Props, void> {
   _renderAddon = ({ navigationState }: any) => {
     const { addonView: AddonView, showAddonOn } = this.props;
     const routeName = getCurrentRouteName(navigationState);
-    console.log(routeName);
     if (AddonView && showAddonOn.indexOf(routeName) !== -1) {
-      console.log('render');
       return <AddonView />;
     }
 
